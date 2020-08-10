@@ -280,6 +280,48 @@ describe('contextify', () => {
 	});
 });
 
+describe('inspect', () => {
+	let vm;
+
+	before(() => {
+		const sandbox = { inspect };
+		vm = new VM({ sandbox });
+	});
+
+	it('primitives', () => {
+		assert.equal(inspect(vm.run('Number(1)')), inspect(Number(1)));
+		assert.equal(inspect(vm.run('String(1)')), inspect(String(1)));
+		assert.equal(inspect(vm.run('Boolean(1)')), inspect(Boolean(1)));
+
+		assert.equal(vm.run('inspect(Number(1))'), inspect(Number(1)));
+		assert.equal(vm.run('inspect(String(1))'), inspect(String(1)));
+		assert.equal(vm.run('inspect(Boolean(1))'), inspect(Boolean(1)));
+
+		assert.equal(inspect(vm.run('new Number(1)')), inspect(new Number(1)));
+		assert.equal(inspect(vm.run('new String(1)')), inspect(new String(1)));
+		assert.equal(inspect(vm.run('new Boolean(1)')), inspect(new Boolean(1)));
+
+		assert.equal(vm.run('inspect(new Number(1))'), inspect(new Number(1)));
+		assert.equal(vm.run('inspect(new String(1))'), inspect(new String(1)));
+		assert.equal(vm.run('inspect(new Boolean(1))'), inspect(new Boolean(1)));
+	});
+
+	it('Date', () => {
+		assert.equal(inspect(vm.run('new Date')).slice(0, -3), inspect(new Date).slice(0, -3));
+		assert.equal(vm.run('inspect(new Date)').slice(0, -3), inspect(new Date).slice(0, -3));
+	});
+
+	it('RegExp', () => {
+		assert.equal(inspect(vm.run('new RegExp("^", "g")')), inspect(new RegExp('^', 'g')));
+		assert.equal(vm.run('inspect(new RegExp("^", "g"))'), inspect(new RegExp('^', 'g')));
+	});
+
+	it('other built-in objects', () => {
+		assert.equal(inspect(vm.run('Proxy')), '[Function: Proxy]');
+		assert.equal(vm.run('inspect(Proxy)'), '[Function: Proxy]');
+	});
+});
+
 describe('VM', () => {
 	let vm;
 
